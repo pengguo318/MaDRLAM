@@ -2,7 +2,7 @@
 The folder consists of all source codes for the paper titled "Multi-Agent Deep Reinforcement Learning for Task Offloading in Group Distributed Manufacturing Systems."
 The original manuscript will be available for public readers after its acceptance.
 
-The key files of the codes are described as follows.
+### The key files of the codes are described as follows.
 The file 'data2' covers the training data set and test data set used in each comparison experiment.
 The file 'act_critic.py' covers the two agents proposed in the article (Task Selection Agent and Computing Node Selection Agent). The collaboration of the two agents is also represented in the file 'act_critic.py'. 
 The file 'Datageneration.py' and the file 'seed.py' are used to generate training and testing datasets.
