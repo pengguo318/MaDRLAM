@@ -24,6 +24,8 @@ class MHA(nn.Module):
 
         self.dk = embedding_size / M
 
+        # Convention : the w* is the linear layer for * ( e.g. wq for q )
+        # Query, key and value layers are seperated
         self.wq = nn.Linear(embedding_size, embedding_size)
 
         self.wk = nn.Linear(embedding_size, embedding_size)
@@ -49,23 +51,27 @@ class MHA(nn.Module):
 
         embedding_size = self.embedding_size
 
+        # Query ----------------------------------------------------------
         q = self.wq(embedding_node)  # (batch,seq_len,embedding)
 
         q = torch.unsqueeze(q, dim=2)
 
         q = q.expand(batch, city_size, city_size, embedding_size)
 
+        # Key ----------------------------------------------------------
         k = self.wk(embedding_node)  # (batch,seq_len,embedding)
 
         k = torch.unsqueeze(k, dim=1)
 
         k = k.expand(batch, city_size, city_size, embedding_size)
 
+        # Value ----------------------------------------------------------
         v = self.wv(embedding_node)  # (batch,seq_len,embedding)
 
         v = torch.unsqueeze(v, dim=1)
 
         v = v.expand(batch, city_size, city_size, embedding_size)
+        # ----------------------------------------------------------------
 
         x = q * k
 
