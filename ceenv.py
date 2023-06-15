@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from gym.utils import EzPickle
 from Params import configs
+
 if torch.cuda.is_available():
     DEVICE = torch.device('cuda')
 else:
@@ -31,12 +32,10 @@ class CLOUD_edge(gym.Env, EzPickle):
 
         self.busy_men_on_cloudy = 0
 
-
-    def reset(self, batch,data):
+    def reset(self, batch, data):
         """initialization"""
         self.batch = batch
         self.job_finish_time_on_cloudy = np.zeros(self.batch * self.maxtasks).reshape((self.batch, -1))
-
 
         self.step_count = 0
         # print(self.step_count)
@@ -56,11 +55,11 @@ class CLOUD_edge(gym.Env, EzPickle):
 
         ##task feature
         ##############################################################
-        self.I = np.full(shape=(self.batch,self.n_j,2), fill_value=0, dtype=bool)
+        self.I = np.full(shape=(self.batch, self.n_j, 2), fill_value=0, dtype=bool)
 
-        self.LBs = np.zeros((self.batch,self.n_j,2), dtype=np.single)
+        self.LBs = np.zeros((self.batch, self.n_j, 2), dtype=np.single)
 
-        self.Fi = np.zeros((self.batch,self.n_j,2), dtype=np.single)
+        self.Fi = np.zeros((self.batch, self.n_j, 2), dtype=np.single)
 
         self.LBm = np.zeros((self.batch, self.n_j, 1), dtype=np.single)
 
@@ -76,21 +75,19 @@ class CLOUD_edge(gym.Env, EzPickle):
         # self.Fi = np.zeros((self.batch,self.n_j,2), dtype=np.single)
         for i in range(self.batch):
             for j in range(self.n_j):
-
+                # on edge
                 self.LBs[i][j][0] = self.dur_l[i][j]
 
+                # on cloud
                 self.LBs[i][j][1] = self.dur_s[i][j] + self.dur_e[i][j]
 
                 self.Fi[i][j][0] = self.T[i][j] - self.LBs[i][j][0]
 
                 self.Fi[i][j][1] = self.T[i][j] - self.LBs[i][j][1]
 
-                self.LBm[i][j][0] = min(self.LBs[i][j][0],self.LBs[i][j][1])
+                self.LBm[i][j][0] = min(self.LBs[i][j][0], self.LBs[i][j][1])
 
                 self.Fim[i][j][0] = self.Fi[i][j][1]
-
-
-
 
         task_feas = np.concatenate((self.LBm.reshape(self.batch, self.n_j, 1),
                                     self.Fim.reshape(self.batch, self.n_j, 1),
@@ -100,13 +97,12 @@ class CLOUD_edge(gym.Env, EzPickle):
                                    , axis=2)
 
         # print(self.I[0])
-        return task_feas,self.task_mask, self.place_time
+        return task_feas, self.task_mask, self.place_time
 
-    def step(self,task_action,p_action):
+    def step(self, task_action, p_action):
         """Update features based on the actions of the agents"""
         for i in range(self.batch):
             if p_action[i] == 1:
-
                 earlist_ind = np.argmin(self.job_finish_time_on_cloudy[i])
 
                 self.job_finish_time_on_cloudy[i][earlist_ind] = self.LBs[i][task_action[i]][1]
@@ -129,7 +125,7 @@ class CLOUD_edge(gym.Env, EzPickle):
 
         # print(p_action[0])
         # print('reward',reward[0])
-        earlist_time = np.zeros((self.batch,1))
+        earlist_time = np.zeros((self.batch, 1))
         for i in range(self.batch):
             earlist_time[i] = min(self.job_finish_time_on_cloudy[i])
         # print(earlist_time[0])
@@ -147,13 +143,13 @@ class CLOUD_edge(gym.Env, EzPickle):
             for j in range(self.n_j):
 
                 if self.I[i][j][0] == False and self.I[i][j][1] == False:
-
                     jobreadytime_a_e = 0
 
                     compute_readytime_a_e = 0
 
                     job_startime_a_e = max(jobreadytime_a_e, compute_readytime_a_e)
 
+                    # dur_l is the processing time of task i in core j
                     job_finishitime_a_e = job_startime_a_e + self.dur_l[i][j]
 
                     self.LBs[i][j][0] = job_finishitime_a_e
@@ -173,12 +169,12 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                     self.Fi[i][j][1] = self.T[i][j] - self.LBs[i][j][1]
 
-                    self.LBm[i][j][0] = min(self.LBs[i][j][0],self.LBs[i][j][1])
+                    # choosing between edge and cloud
+                    # based on the time that the task is finished
+                    self.LBm[i][j][0] = min(self.LBs[i][j][0], self.LBs[i][j][1])
 
+                    # is this ok ?? It chooses the Fi on cloud
                     self.Fim[i][j][0] = self.Fi[i][j][1]
-
-
-
 
         task_feas = np.concatenate((self.LBm.reshape(self.batch, self.n_j, 1),
                                     self.Fim.reshape(self.batch, self.n_j, 1),
@@ -190,9 +186,8 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print('LBs',self.LBs[0])
         # print('F',self.Fi[0])
 
-
         # print(self.task_mask[0])
-        return task_feas, self.task_mask, self.place_time,reward
+        return task_feas, self.task_mask, self.place_time, reward
 
 
 """test"""
@@ -221,4 +216,3 @@ class CLOUD_edge(gym.Env, EzPickle):
 # for i in range(10):
 #
 #     task_feas, task_mask, place_time, reward = env.step(task[i].reshape(24), place[i].reshape(24))
-
