@@ -1,7 +1,7 @@
 from Params import configs
 from ceenv import CLOUD_edge
 import torch.nn as nn
-from transformer import Encoder1, Encoder
+from transformer import Encoder1
 import torch
 from agent_utils import select_action
 from agent_utils import greedy_select_action
