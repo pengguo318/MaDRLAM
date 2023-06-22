@@ -143,7 +143,7 @@ class actor_critic(nn.Module):
 
         action_pro = torch.zeros(self.batch, configs.n_j).to(DEVICE).view(1, -1).squeeze().to(DEVICE)
 
-        p_action_pro = torch.zeros(self.batch, configs.n_j).to(DEVICE).view(1, -1).squeeze().to(DEVICE)
+        place_action_pro = torch.zeros(self.batch, configs.n_j).to(DEVICE).view(1, -1).squeeze().to(DEVICE)
 
         task_feas, task_mask, place_time = self.env.reset(self.batch, data)
 
@@ -165,7 +165,7 @@ class actor_critic(nn.Module):
 
             task_seq_list.append(task_op)
 
-            p_op, p_action_pro = self.actor2(index, task_op, p_action_pro, place_time, process_time, train)
+            p_op, place_action_pro = self.actor2(index, task_op, place_action_pro, place_time, process_time, train)
 
             p_op_list.append(p_op)
 
@@ -173,7 +173,7 @@ class actor_critic(nn.Module):
 
             rewards += reward
 
-        p_action_pro = p_action_pro.view(self.batch, configs.n_j)  ##(batch,n)
+        place_action_pro = place_action_pro.view(self.batch, configs.n_j)  ##(batch,n)
 
         task_action_pro = action_pro.view(self.batch, configs.n_j)  ##(batch,n)！！！！！
 
@@ -193,7 +193,7 @@ class actor_critic(nn.Module):
 
         rewards = rewards.to(torch.float32)
 
-        return task_seq, place_seq, task_action_pro, p_action_pro, rewards
+        return task_seq, place_seq, task_action_pro, place_action_pro, rewards
 
     # Updates actor 1 nn
     def updata(self, task_action_pro, reward1, q, lr):# q is the reward2
