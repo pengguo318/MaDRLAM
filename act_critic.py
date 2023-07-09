@@ -5,6 +5,7 @@ from transformer import Encoder1
 import torch
 from torch import optim
 from task_actor import task_actor
+from place_actor import place_actor
 
 if torch.cuda.is_available():
     DEVICE = torch.device('cuda')
@@ -32,13 +33,13 @@ class actor_critic(nn.Module):
                               maxtasks=configs.maxtask,
                               max_Men=configs.Men)
 
-        self.actor1 = task_actor(batch=batch,
-                                 hidden_dim=hidden_dim,
-                                 M=M)
+        self.task_actor = task_actor(batch=batch,
+                                     hidden_dim=hidden_dim,
+                                     M=M)
 
-        self.actor2 = place_actor(batch=batch,
-                                  hidden_dim=hidden_dim,
-                                  M=M)
+        self.place_actor = place_actor(batch=batch,
+                                       hidden_dim=hidden_dim,
+                                       M=M)
 
         self.batch = batch
 
@@ -62,18 +63,18 @@ class actor_critic(nn.Module):
         for i in range(configs.n_j):
             index = i
 
-            task_op, action_pro, process_time = self.actor1(data, index, task_feas, task_mask, action_pro,
-                                                            train)  ##选择任务
+            task_action, action_pro, process_time = self.task_actor(data, index, task_feas, task_mask, action_pro,
+                                                                train)  ##选择任务
             # I think task_op determines which task has the most priority
-            ind = torch.unsqueeze(task_op, 1).tolist()
+            ind = torch.unsqueeze(task_action, 1).tolist()
 
-            task_seq_list.append(task_op)
+            task_seq_list.append(task_action)
 
-            p_op, place_action_pro = self.actor2(index, task_op, place_action_pro, place_time, process_time, train)
+            place_action, place_action_pro = self.place_actor(index, task_action, place_action_pro, place_time, process_time, train)
 
-            p_op_list.append(p_op)
+            p_op_list.append(place_action)
 
-            task_feas, task_mask, place_time, reward = self.env.step(task_op, p_op)
+            task_feas, task_mask, place_time, reward = self.env.step(task_action, place_action)
 
             rewards += reward
 
@@ -102,7 +103,7 @@ class actor_critic(nn.Module):
     # Updates actor 1 nn
     def updata(self, task_action_pro, reward1, q, lr):# q is the reward2
 
-        opt = optim.Adam(self.actor1.parameters(), lr)
+        opt = optim.Adam(self.task_actor.parameters(), lr)
 
         pro = torch.log(task_action_pro)
 
@@ -123,7 +124,7 @@ class actor_critic(nn.Module):
     # Updates actor 2 nn
     def updata2(self, p_action_pro, reward1, q, lr):
 
-        opt = optim.Adam(self.actor2.parameters(), lr)
+        opt = optim.Adam(self.place_actor.parameters(), lr)
 
         pro = torch.log(p_action_pro)
 
