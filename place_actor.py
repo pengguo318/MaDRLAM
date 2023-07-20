@@ -46,7 +46,7 @@ class place_actor(nn.Module):
 
         self.k = nn.Linear(hidden_dim, hidden_dim)
 
-    def forward(self, index, task_op, p_action_pro, place_time, process_time, train):
+    def forward(self, index, task_op, p_action_probability, place_time, process_time, train):
 
         p_feas = np.concatenate((place_time.reshape(self.batch, 2, 1),
                                  process_time.reshape(self.batch, 2, 1))
@@ -63,6 +63,9 @@ class place_actor(nn.Module):
             p_tag1[i] = 2 * i
 
         nodes, grapha = self.p_encoder(p_feas)
+
+        # I think rest of the method is decoder.
+        # Decoder calculates the probability distribution in action space.
 
         torch.cuda.empty_cache()
 
@@ -84,9 +87,13 @@ class place_actor(nn.Module):
 
         temp = temp / (dk ** 0.5)
 
+        # Probability distribution between nodes ---------------
+
         temp = torch.tanh(temp) * C
 
         p = F.softmax(temp, dim=1)  #
+
+        # Probability distribution between nodes ---------------
 
         ppp = p.view(1, -1).squeeze()
 
@@ -99,7 +106,7 @@ class place_actor(nn.Module):
         else:
             action_index = greedy_select_action(p)
 
-        p_action_pro[p_tag + index] = ppp[p_tag1 + action_index]
+        p_action_probability[p_tag + index] = ppp[p_tag1 + action_index]
 
-        return action_index, p_action_pro
+        return action_index, p_action_probability
 

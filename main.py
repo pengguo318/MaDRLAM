@@ -39,7 +39,7 @@ Net2 = actor_critic(batch=configs.batch,
                     M=8,
                     device=configs.device).to(DEVICE)
 
-Net2.actor2.load_state_dict(Net1.actor2.state_dict())
+Net2.place_actor.load_state_dict(Net1.place_actor.state_dict())
 
 min = 50000000000
 
@@ -54,7 +54,7 @@ elif configs.batch == 8:
 
 bl_alpha = 0.05
 
-output_dir = 'train_process//{}//compare{}'.format(configs.n_j,compare)##
+output_dir = 'train_process//{}//compare{}'.format(configs.n_j, compare)
 
 save_dir = os.path.join(os.getcwd(), output_dir)
 

@@ -6,6 +6,12 @@ from agent_utils import select_action
 from agent_utils import greedy_select_action
 from agent_utils import sample_select_action
 import numpy as np
+import torch.nn.functional as F
+
+if torch.cuda.is_available():
+    DEVICE = torch.device('cuda')
+else:
+    DEVICE = torch.device('cpu')
 
 class task_actor(nn.Module):
     """Task Selection Agent;
@@ -69,11 +75,15 @@ class task_actor(nn.Module):
 
         temp = temp / (dk ** 0.5)
 
+        # Probability distribution between nodes ---------------
         temp = torch.tanh(temp) * C
 
         temp.masked_fill_(mask, float('-inf'))
 
-        p = F.softmax(temp, dim=1)  #
+        # "p" stands for probability
+        p = F.softmax(temp, dim=1)
+
+        # -----------------------------------------------------
 
         ppp = p.view(1, -1).squeeze()
 

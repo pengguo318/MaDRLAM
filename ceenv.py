@@ -10,6 +10,8 @@ else:
     DEVICE = torch.device('cpu')
 
 """Environment for agent interaction, covering feature extraction and update"""
+
+
 class CLOUD_edge(gym.Env, EzPickle):
     def __init__(self,
                  n_j,
@@ -115,6 +117,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print(self.job_finish_time_on_cloudy[0])
 
         for i in range(self.batch):
+            #  if the task meets deadline or not
             if self.LBs[i][task_action[i]][p_action[i]] <= self.T[i][task_action[i]]:
 
                 reward[i] = self.LBs[i][task_action[i]][p_action[i]]
@@ -143,29 +146,29 @@ class CLOUD_edge(gym.Env, EzPickle):
             for j in range(self.n_j):
 
                 if self.I[i][j][0] == False and self.I[i][j][1] == False:
-                    jobreadytime_a_e = 0
+                    job_ready_time_a_e = 0
 
-                    compute_readytime_a_e = 0
+                    compute_ready_time_a_e = 0
 
-                    job_startime_a_e = max(jobreadytime_a_e, compute_readytime_a_e)
+                    job_start_time_a_e = max(job_ready_time_a_e, compute_ready_time_a_e)
 
                     # dur_l is the processing time of task i in core j
-                    job_finishitime_a_e = job_startime_a_e + self.dur_l[i][j]
+                    job_finish_time_a_e = job_start_time_a_e + self.dur_l[i][j]
 
-                    self.LBs[i][j][0] = job_finishitime_a_e
+                    self.LBs[i][j][0] = job_finish_time_a_e
 
                     self.Fi[i][j][0] = self.T[i][j] - self.LBs[i][j][0]
 
                     ##CLOUD
-                    jobreadytime_a_C = self.dur_s[i][j]
+                    job_ready_time_a_c = self.dur_s[i][j]
 
-                    compute_readytime_a_C = min(self.job_finish_time_on_cloudy[i])
+                    compute_ready_time_a_c = min(self.job_finish_time_on_cloudy[i])
 
-                    job_startime_a_C = max(jobreadytime_a_C, compute_readytime_a_C)
+                    job_start_time_a_c = max(job_ready_time_a_c, compute_ready_time_a_c)
 
-                    job_finishitime_a_C = job_startime_a_C + self.dur_e[i][j]
+                    job_finished_time_a_c = job_start_time_a_c + self.dur_e[i][j]
 
-                    self.LBs[i][j][1] = job_finishitime_a_C
+                    self.LBs[i][j][1] = job_finished_time_a_c
 
                     self.Fi[i][j][1] = self.T[i][j] - self.LBs[i][j][1]
 

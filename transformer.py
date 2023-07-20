@@ -71,8 +71,8 @@ class MHA(nn.Module):
         v = torch.unsqueeze(v, dim=1)
 
         v = v.expand(batch, city_size, city_size, embedding_size)
-        # ----------------------------------------------------------------
 
+        # The attention weight for node i --------------------------------
         x = q * k
 
         x = x.view(batch, city_size, city_size, self.M, -1)
@@ -82,6 +82,8 @@ class MHA(nn.Module):
         x = x / (self.dk ** 0.5)
 
         x = F.softmax(x, dim=2)
+
+        # ----------------------------------------------------------------
 
         x = torch.unsqueeze(x, dim=4)
 
@@ -124,6 +126,7 @@ class MHA(nn.Module):
 
         return x
 
+
 class Encoder1(nn.Module):
     def __init__(self,Inputdim,embedding_size,M):
         super().__init__()
@@ -151,32 +154,4 @@ class Encoder1(nn.Module):
 
         avg = torch.mean(x, dim=1)
 
-        return x,avg
-
-# class Encoder(nn.Module):
-#     def __init__(self,Inputdim,embedding_size,M):
-#         super().__init__()
-#
-#         self.embedding = nn.Linear(Inputdim, embedding_size)
-#
-#         self.embedding_node = embedding_size
-#
-#         self.MHA = MHA(embedding_size,M)
-#
-#     def forward(self,node):
-#
-#         node = self.embedding(node)
-#         # print(node.shape)
-#         for i in range(3):
-#
-#             x = self.MHA(node)
-#
-#             node = x
-#
-#         x = node
-#
-#         x = x.contiguous()
-#
-#         avg = torch.mean(x, dim=1)
-#
-#         return x,avg
+        return x, avg
