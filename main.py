@@ -5,11 +5,6 @@ import os
 import numpy as np
 from act_critic import actor_critic
 
-
-
-"""The main function of model training"""
-
-
 if torch.cuda.is_available():
     DEVICE = torch.device('cuda')
 else:
