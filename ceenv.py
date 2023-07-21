@@ -11,6 +11,10 @@ else:
 
 """Environment for agent interaction, covering feature extraction and update"""
 
+INITIAL_ENERGY = 4000
+PROCESS_ENERGY_FACTOR = 2
+OFFLOAD_ENERGY_FACTOR = 1
+
 
 class CLOUD_edge(gym.Env, EzPickle):
     def __init__(self,
@@ -73,6 +77,11 @@ class CLOUD_edge(gym.Env, EzPickle):
         self.task_mask = np.full(shape=self.T.shape, fill_value=0, dtype=bool)
 
         self.place_mask = np.full(shape=self.LBs.shape, fill_value=0, dtype=bool)
+
+        self.edges_energies = np.zeros(self.n_j)
+        self.energy_offload_consumption = np.datasize() * OFFLOAD_ENERGY_FACTOR
+        self.energy_process_consumption = np.datasize() * PROCESS_ENERGY_FACTOR
+
         # print('T',self.task_mask.shape)
         # self.Fi = np.zeros((self.batch,self.n_j,2), dtype=np.single)
         for i in range(self.batch):
