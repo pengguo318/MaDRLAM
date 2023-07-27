@@ -79,8 +79,6 @@ class CLOUD_edge(gym.Env, EzPickle):
         self.place_mask = np.full(shape=self.LBs.shape, fill_value=0, dtype=bool)
 
         self.edges_energies = np.zeros(self.n_j)
-        self.energy_offload_consumption = np.datasize() * OFFLOAD_ENERGY_FACTOR
-        self.energy_process_consumption = np.datasize() * PROCESS_ENERGY_FACTOR
 
         # print('T',self.task_mask.shape)
         # self.Fi = np.zeros((self.batch,self.n_j,2), dtype=np.single)
@@ -126,11 +124,25 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print(self.job_finish_time_on_cloudy[0])
 
         for i in range(self.batch):
+            processed = False
+
             #  if the task meets deadline or not
             if self.LBs[i][task_action[i]][p_action[i]] <= self.T[i][task_action[i]]:
+                # reducing process energy from selected edge
+                if p_action[i] == 1:
+                    energy_offload_consumption = self.datasize[i][task_action[i]] * OFFLOAD_ENERGY_FACTOR
+                    if self.edges_energies[task_action[i]] >= energy_offload_consumption:
+                        self.edges_energies[task_action[i]] -= energy_offload_consumption
+                        processed = True
 
+                if p_action[i] == 0:
+                    energy_process_consumption = self.datasize[i][task_action[i]] * PROCESS_ENERGY_FACTOR
+                    if self.edges_energies[task_action[i]] >= energy_process_consumption:
+                        self.edges_energies[task_action[i]] -= energy_process_consumption
+                        processed = True
+
+            if processed:
                 reward[i] = self.LBs[i][task_action[i]][p_action[i]]
-
             else:
                 reward[i] = self.LBs[i][task_action[i]][p_action[i]] * 10
                 # print('timewindows')
