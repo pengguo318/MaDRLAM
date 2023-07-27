@@ -124,27 +124,28 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print(self.job_finish_time_on_cloudy[0])
 
         for i in range(self.batch):
+            selected_node = task_action[i]
             processed = False
 
             #  if the task meets deadline or not
-            if self.LBs[i][task_action[i]][p_action[i]] <= self.T[i][task_action[i]]:
+            if self.LBs[i][selected_node][p_action[i]] <= self.T[i][selected_node]:
                 # reducing process energy from selected edge
                 if p_action[i] == 1:
-                    energy_offload_consumption = self.datasize[i][task_action[i]] * OFFLOAD_ENERGY_FACTOR
-                    if self.edges_energies[task_action[i]] >= energy_offload_consumption:
-                        self.edges_energies[task_action[i]] -= energy_offload_consumption
+                    energy_offload_consumption = self.datasize[i][selected_node] * OFFLOAD_ENERGY_FACTOR
+                    if self.edges_energies[selected_node] >= energy_offload_consumption:
+                        self.edges_energies[selected_node] -= energy_offload_consumption
                         processed = True
 
                 if p_action[i] == 0:
-                    energy_process_consumption = self.datasize[i][task_action[i]] * PROCESS_ENERGY_FACTOR
-                    if self.edges_energies[task_action[i]] >= energy_process_consumption:
-                        self.edges_energies[task_action[i]] -= energy_process_consumption
+                    energy_process_consumption = self.datasize[i][selected_node] * PROCESS_ENERGY_FACTOR
+                    if self.edges_energies[selected_node] >= energy_process_consumption:
+                        self.edges_energies[selected_node] -= energy_process_consumption
                         processed = True
 
             if processed:
-                reward[i] = self.LBs[i][task_action[i]][p_action[i]]
+                reward[i] = self.LBs[i][selected_node][p_action[i]]
             else:
-                reward[i] = self.LBs[i][task_action[i]][p_action[i]] * 10
+                reward[i] = self.LBs[i][selected_node][p_action[i]] * 10
                 # print('timewindows')
 
         # print(p_action[0])
