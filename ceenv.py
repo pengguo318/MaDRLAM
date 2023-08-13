@@ -19,18 +19,15 @@ OFFLOAD_ENERGY_FACTOR = 1
 class CLOUD_edge(gym.Env, EzPickle):
     def __init__(self,
                  n_j,
-                 maxtasks,
-                 max_Men):
+                 maxtasks):
         EzPickle.__init__(self)
         self.maxtasks = maxtasks
 
         self.n_j = n_j
 
-        self.maxMen = max_Men
-
         self.step_count = 0
 
-        self.L = 50  ##penalty value
+        self.L = 50  # penalty value
 
         self.number_of_jobs = n_j
 
