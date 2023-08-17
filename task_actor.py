@@ -98,15 +98,11 @@ class task_actor(nn.Module):
 
         action_pro[tag + index] = ppp[tag + action_index]  ###############wenti
 
-        dur_l = np.array(data[2], dtype=np.single)  # single  ##
-
-        dur_e = np.array(data[3], dtype=np.single)
-
-        dur_s = np.array(data[4], dtype=np.single)
-
         datasize = np.array(data[0], dtype=np.single)
-
         T = np.array(data[1], dtype=np.single)
+        dur_l = np.array(data[2], dtype=np.single)  # single  ##
+        dur_e = np.array(data[3], dtype=np.single)
+        dur_s = np.array(data[4], dtype=np.single)
 
         process_time = np.zeros((self.batch, 2), dtype=np.single)
 
