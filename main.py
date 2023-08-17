@@ -4,6 +4,7 @@ import torch
 import os
 import numpy as np
 from act_critic import actor_critic
+from scipy.stats import ttest_rel
 
 if torch.cuda.is_available():
     DEVICE = torch.device('cuda')
@@ -16,13 +17,13 @@ size = '1000_2000'
 
 """Load training data and test data"""
 
-datas = np.load('..//data2//{}//compare{}//datas{}_{}.npy'.format(configs.n_j,compare,configs.n_j,size))
+datas = np.load('.//data2//{}//compare{}//datas{}_{}.npy'.format(configs.n_j, compare, configs.n_j, size))
 
 datas.astype('float16')
 
 print(datas.dtype)
 
-testdatas = np.load('..//data2//{}//compare{}//com_testdatas{}_{}.npy'.format(configs.n_j,compare,configs.n_j,size))
+testdatas = np.load('.//data2//{}//compare{}//com_testdatas{}_{}.npy'.format(configs.n_j,compare,configs.n_j,size))
 
 Net1 = actor_critic(batch=configs.batch,
                     hidden_dim = configs.hidden_dim,
@@ -49,11 +50,9 @@ elif configs.batch == 8:
 
 bl_alpha = 0.05
 
-output_dir = 'train_process//{}//compare{}'.format(configs.n_j, compare)
+output_dir = 'train_process\{}\compare{}'.format(configs.n_j, compare)
 
 save_dir = os.path.join(os.getcwd(), output_dir)
-
-from scipy.stats import ttest_rel
 
 contintrain = 0
 
@@ -67,7 +66,7 @@ for epoch in range(configs.epochs):
         # Getting information about env
         task_seq, p_seq, task_action_pro, p_action_pro, reward1 = Net1(data, 1)
 
-        _,_,_,_,reward2 = Net2(data, 1)
+        _, _, _, _, reward2 = Net2(data, 1)
 
         reward1 = reward1.detach()
 
@@ -75,7 +74,7 @@ for epoch in range(configs.epochs):
 
         # Update networks information found in line 73
         Net1.updata(task_action_pro, reward1, reward2, lr)
-        Net1.updata2(p_action_pro, reward1, reward2,lr)
+        Net1.updata2(p_action_pro, reward1, reward2, lr)
 
         print('epoch={},i={},time1={},time2={}'.format(epoch, i, torch.mean(reward1),
                                                        torch.mean(reward2)))
@@ -125,7 +124,7 @@ for epoch in range(configs.epochs):
                 # file_writing_obj1 = open('/content/MaDRLAM/lr_change/lr_000005/train_vali/{}/compare{}/{}_{}.txt'.format(configs.n_j, compare,configs.n_j,configs.maxtask),
                 #                          'a')
 
-                file_writing_obj1 = open('./MaDRLAM/lr_000005/{}_{}.txt'.format(configs.n_j, configs.maxtask),
+                file_writing_obj1 = open('./lr_000005/{}_{}.txt'.format(configs.n_j, configs.maxtask),
                     'a')
 
                 file_writing_obj1.writelines(str(length) + '\n')
