@@ -61,7 +61,6 @@ Net2.load_state_dict(Net1.state_dict())
 for epoch in range(configs.epochs):
     for i in range(configs.time):
         data = datas[i]
-        # print(data.shape)
 
         # Getting information about env
         task_seq, p_seq, task_action_pro, p_action_pro, reward1 = Net1(data, 1)
@@ -78,7 +77,6 @@ for epoch in range(configs.epochs):
 
         print('epoch={},i={},time1={},time2={}'.format(epoch, i, torch.mean(reward1),
                                                        torch.mean(reward2)))
-        reward1 = reward1
 
         with torch.no_grad():
 
