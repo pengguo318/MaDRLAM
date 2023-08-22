@@ -95,7 +95,7 @@ class CLOUD_edge(gym.Env, EzPickle):
                                     self.Fim.reshape(self.batch, self.n_j, 1),
                                     self.task_mask.reshape(self.batch, self.n_j, 1),
 
-                                   )
+                                    )
                                    , axis=2)
 
         # print(self.I[0])
@@ -153,20 +153,24 @@ class CLOUD_edge(gym.Env, EzPickle):
                     job_start_time_a_e = max(job_ready_time_a_e, compute_ready_time_a_e)
 
                     # dur_l is the processing time of task i in core j
-                    job_finish_time_a_e = job_start_time_a_e + self.dur_l[i][j]
+                    job_busy_time_a_e = np.sum(self.LBs[:, j, 0])
+
+                    job_finish_time_a_e = job_busy_time_a_e + job_start_time_a_e + self.dur_l[i][j]
 
                     self.LBs[i][j][0] = job_finish_time_a_e
 
                     self.Fi[i][j][0] = self.T[i][j] - self.LBs[i][j][0]
 
-                    ##CLOUD
+                    # CLOUD
                     job_ready_time_a_c = self.dur_s[i][j]
 
                     compute_ready_time_a_c = min(self.job_finish_time_on_cloudy[i])
 
                     job_start_time_a_c = max(job_ready_time_a_c, compute_ready_time_a_c)
 
-                    job_finished_time_a_c = job_start_time_a_c + self.dur_e[i][j]
+                    job_busy_time_a_c = np.sum(self.LBs[:, j, 1])
+
+                    job_finished_time_a_c = job_busy_time_a_c + job_start_time_a_c + self.dur_e[i][j]
 
                     self.LBs[i][j][1] = job_finished_time_a_c
 
