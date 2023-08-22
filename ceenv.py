@@ -98,6 +98,16 @@ class CLOUD_edge(gym.Env, EzPickle):
         return task_features, self.task_mask, self.place_time
 
     def step(self, task_action, p_action):
+
+        # print("============================================================================================================")
+        # print("<<<<<<<<<<<<<<< task_action ")
+        # print(task_action)
+        # print("task_action >>>>>>>>>>>>>>>>")
+        #
+        # print("<<<<<<<<<<<<<<< p_action ")
+        # print(p_action)
+        # print("p_action >>>>>>>>>>>>>>>>")
+
         """Update features based on the actions of the agents"""
         for i in range(self.batch):
             if p_action[i] == 1:
@@ -160,12 +170,10 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                     job_start_time_a_e = max(job_ready_time_a_e, compute_ready_time_a_e)
 
-                    # dur_l is the processing time of task i in core j
+                    # dur_l is the processing time of task i in core j in edge layer
                     job_finish_time_a_e = job_start_time_a_e + self.dur_l[i][j]
 
                     self.LBs[i][j][0] = job_finish_time_a_e
-
-                    self.Fi[i][j][0] = self.deadline[i][j] - self.LBs[i][j][0]
 
                     # CLOUD
                     job_ready_time_a_c = self.dur_s[i][j]
@@ -177,7 +185,8 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                     self.LBs[i][j][1] = job_finished_time_a_c
 
-                    self.Fi[i][j][1] = self.deadline[i][j] - self.LBs[i][j][1]
+                    # calculating remained time to deadline
+                    self.Fi[i][j] = self.deadline[i][j] - self.LBs[i][j]
 
                     # choosing between edge and cloud
                     # based on the time that the task is finished
