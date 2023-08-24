@@ -94,7 +94,6 @@ class CLOUD_edge(gym.Env, EzPickle):
         task_feas = np.concatenate((self.LBm.reshape(self.batch, self.n_j, 1),
                                     self.Fim.reshape(self.batch, self.n_j, 1),
                                     self.task_mask.reshape(self.batch, self.n_j, 1),
-
                                     )
                                    , axis=2)
 
@@ -195,6 +194,18 @@ class CLOUD_edge(gym.Env, EzPickle):
 
         # print(self.task_mask[0])
         return task_feas, self.task_mask, self.place_time, reward
+
+def calculate_load_balance_efficiency(tasks_per_node):
+    n = len(tasks_per_node)
+    m = sum(tasks_per_node)
+    avg_tasks_per_node = m / n
+
+    squared_diff_sum = sum((tasks - avg_tasks_per_node)**2 for tasks in tasks_per_node)
+    std_deviation = (squared_diff_sum / n)**0.5
+
+    cv = (std_deviation / avg_tasks_per_node) * 100
+    return cv
+
 
 
 """test"""
