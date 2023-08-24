@@ -158,7 +158,11 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                     self.LBs[i][j][0] = job_finish_time_a_e
 
-                    self.Fi[i][j][0] = self.T[i][j] - self.LBs[i][j][0]
+                    if self.T[i][j] < self.LBs[i][j][0]:
+                        self.Fi[i][j][0] = 0
+                        self.LBs[i][j][0] = self.T[i][j]
+                    else:
+                        self.Fi[i][j][0] = self.T[i][j] - self.LBs[i][j][0]
 
                     # CLOUD
                     job_ready_time_a_c = self.dur_s[i][j]
@@ -173,7 +177,12 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                     self.LBs[i][j][1] = job_finished_time_a_c
 
-                    self.Fi[i][j][1] = self.T[i][j] - self.LBs[i][j][1]
+                    if self.T[i][j] < self.LBs[i][j][1]:
+                        # If finish time exceeds deadline, put finish time equal to deadline
+                        self.LBs[i][j][1] = self.T[i][j]
+                        self.Fi[i][j][1] = 0
+                    else:
+                        self.Fi[i][j][1] = self.T[i][j] - self.LBs[i][j][1]
 
                     # choosing between edge and cloud
                     # based on the time that the task is finished
@@ -185,7 +194,6 @@ class CLOUD_edge(gym.Env, EzPickle):
         task_feas = np.concatenate((self.LBm.reshape(self.batch, self.n_j, 1),
                                     self.Fim.reshape(self.batch, self.n_j, 1),
                                     self.task_mask.reshape(self.batch, self.n_j, 1),
-
                                     )
                                    , axis=2)
 
@@ -194,6 +202,7 @@ class CLOUD_edge(gym.Env, EzPickle):
 
         # print(self.task_mask[0])
         return task_feas, self.task_mask, self.place_time, reward
+
 
 def calculate_load_balance_efficiency(tasks_per_node):
     n = len(tasks_per_node)
