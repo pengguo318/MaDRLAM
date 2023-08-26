@@ -21,13 +21,13 @@ size = '1000_2000'
 
 """Load training data and test data"""
 
-datas = np.load('..//data2//{}//compare{}//datas{}_{}.npy'.format(configs.n_j,compare,configs.n_j,size))
+datas = np.load('.//data2//{}//compare{}//datas{}_{}.npy'.format(configs.n_j,compare,configs.n_j,size))
 
 datas.astype('float16')
 
 print(datas.dtype)
 
-testdatas = np.load('..//data2//{}//compare{}//com_testdatas{}_{}.npy'.format(configs.n_j,compare,configs.n_j,size))
+testdatas = np.load('.//data2//{}//compare{}//com_testdatas{}_{}.npy'.format(configs.n_j,compare,configs.n_j,size))
 
 Net1 = actor_critic(batch=configs.batch,
                     hidden_dim = configs.hidden_dim,
@@ -130,7 +130,7 @@ for epoch in range(configs.epochs):
                 # file_writing_obj1 = open('/content/MaDRLAM/lr_change/lr_000005/train_vali/{}/compare{}/{}_{}.txt'.format(configs.n_j, compare,configs.n_j,configs.maxtask),
                 #                          'a')
 
-                file_writing_obj1 = open('./MaDRLAM/lr_000005/{}_{}.txt'.format(configs.n_j, configs.maxtask),
+                file_writing_obj1 = open('./lr_000005/{}_{}.txt'.format(configs.n_j, configs.maxtask),
                     'a')
 
                 file_writing_obj1.writelines(str(length) + '\n')
