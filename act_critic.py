@@ -48,7 +48,7 @@ class actor_critic(nn.Module):
     def forward(self, data, train):
 
         #     node 0 to 9 are local, node 10 to 19 are cloud
-        tasks_per_node = np.zeros(self.n_j * 2)
+        tasks_per_node = np.zeros(configs.n_j * 2)
 
         action_pro = torch.zeros(self.batch, configs.n_j).to(DEVICE).view(1, -1).squeeze().to(DEVICE)
 
