@@ -101,7 +101,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print(self.I[0])
         return task_feas, self.task_mask, self.place_time
 
-    def step(self, task_action, p_action):
+    def step(self, task_action, p_action, tasks_per_node):
         """Update features based on the actions of the agents"""
         for i in range(self.batch):
             if p_action[i] == 1:
@@ -112,6 +112,8 @@ class CLOUD_edge(gym.Env, EzPickle):
                 min_ind = np.argmin(self.job_finish_time_on_cloudy[i])
 
                 self.place_time[i][1] = self.job_finish_time_on_cloudy[i][min_ind]
+
+            tasks_per_node[p_action[i] * 10 + task_action[i]] += 1
 
         reward = np.zeros((self.batch, 1))
         # print(self.job_finish_time_on_cloudy[0])
@@ -190,7 +192,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print('F',self.Fi[0])
 
         # print(self.task_mask[0])
-        return task_feas, self.task_mask, self.place_time, reward
+        return task_feas, self.task_mask, self.place_time, reward, tasks_per_node
 
 
 """test"""
