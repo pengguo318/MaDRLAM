@@ -6,6 +6,7 @@ import torch
 from torch import optim
 from task_actor import task_actor
 from place_actor import place_actor
+import numpy as np
 
 if torch.cuda.is_available():
     DEVICE = torch.device('cuda')
@@ -64,16 +65,15 @@ class actor_critic(nn.Module):
         q = torch.zeros((self.batch, 1)).to(DEVICE)
 
         for i in range(configs.n_j):
-            index = i
+            job_index = i
 
-            task_action, action_pro, process_time = self.task_actor(data, index, task_feas, task_mask, action_pro,
-                                                                train)  ##选择任务
+            task_action, action_pro, process_time = self.task_actor(data, job_index, task_feas, task_mask, action_pro, train)  ##选择任务
             # I think task_op determines which task has the most priority
             ind = torch.unsqueeze(task_action, 1).tolist()
 
             task_seq_list.append(task_action)
 
-            place_action, place_action_pro = self.place_actor(index, task_action, place_action_pro, place_time, process_time, train)
+            place_action, place_action_pro = self.place_actor(job_index, task_action, place_action_pro, place_time, process_time, train)
 
             p_op_list.append(place_action)
 
