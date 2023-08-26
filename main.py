@@ -70,7 +70,7 @@ for epoch in range(configs.epochs):
         # print(data.shape)
 
         # Getting information about env
-        task_seq, p_seq, task_action_pro, p_action_pro, reward1 = Net1(data, 1)
+        task_seq, p_seq, task_action_pro, p_action_pro, reward1, load_balancing_eff = Net1(data, 1)
 
         _,_,_,_,reward2 = Net2(data, 1)
 
