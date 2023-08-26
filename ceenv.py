@@ -203,7 +203,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print('F',self.Fi[0])
 
         # print(self.task_mask[0])
-        return task_feas, self.task_mask, self.place_time, reward, load_balancing_eff
+        return task_feas, self.task_mask, self.place_time, reward, tasks_per_node
 
 
 

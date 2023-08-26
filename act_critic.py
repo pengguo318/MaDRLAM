@@ -77,7 +77,7 @@ class actor_critic(nn.Module):
 
             p_op_list.append(place_action)
 
-            task_feas, task_mask, place_time, reward, load_balancing_eff = self.env.step(task_action, place_action, tasks_per_node)
+            task_feas, task_mask, place_time, reward, tasks_per_node = self.env.step(task_action, place_action, tasks_per_node)
 
             rewards += reward
 
