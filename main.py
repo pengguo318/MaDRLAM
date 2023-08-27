@@ -5,10 +5,7 @@ import os
 import numpy as np
 from act_critic import actor_critic
 
-
-
 """The main function of model training"""
-
 
 if torch.cuda.is_available():
     DEVICE = torch.device('cuda')
@@ -21,21 +18,21 @@ size = '1000_2000'
 
 """Load training data and test data"""
 
-datas = np.load('.//data2//{}//compare{}//datas{}_{}.npy'.format(configs.n_j,compare,configs.n_j,size))
+datas = np.load('.//data2//{}//compare{}//datas{}_{}.npy'.format(configs.n_j, compare, configs.n_j, size))
 
 datas.astype('float16')
 
 print(datas.dtype)
 
-testdatas = np.load('.//data2//{}//compare{}//com_testdatas{}_{}.npy'.format(configs.n_j,compare,configs.n_j,size))
+testdatas = np.load('.//data2//{}//compare{}//com_testdatas{}_{}.npy'.format(configs.n_j, compare, configs.n_j, size))
 
 Net1 = actor_critic(batch=configs.batch,
-                    hidden_dim = configs.hidden_dim,
+                    hidden_dim=configs.hidden_dim,
                     M=8,
                     device=configs.device).to(DEVICE)
 
 Net2 = actor_critic(batch=configs.batch,
-                    hidden_dim = configs.hidden_dim,
+                    hidden_dim=configs.hidden_dim,
                     M=8,
                     device=configs.device).to(DEVICE)
 
@@ -43,10 +40,9 @@ Net2.place_actor.load_state_dict(Net1.place_actor.state_dict())
 
 min = 50000000000
 
-
 if configs.batch == 24:
     lr = 0.000005
-    print('lr=',lr)
+    print('lr=', lr)
 
 elif configs.batch == 8:
     lr = 0.0000005
@@ -80,7 +76,7 @@ for epoch in range(configs.epochs):
 
         # Update networks information found in line 73
         Net1.updata(task_action_pro, reward1, reward2, lr)
-        Net1.updata2(p_action_pro, reward1, reward2,lr)
+        Net1.updata2(p_action_pro, reward1, reward2, lr)
 
         print('epoch={},i={},time1={},time2={}'.format(epoch, i, torch.mean(reward1),
                                                        torch.mean(reward2)))
@@ -97,7 +93,6 @@ for epoch in range(configs.epochs):
                 assert tt < 0, "T-statistic should be negative"
 
                 if p_val < bl_alpha:
-
                     print('Update baseline')
 
                     Net2.load_state_dict(Net1.state_dict())
@@ -131,7 +126,7 @@ for epoch in range(configs.epochs):
                 #                          'a')
 
                 file_writing_obj1 = open('./lr_000005/{}_{}.txt'.format(configs.n_j, configs.maxtask),
-                    'a')
+                                         'a')
 
                 file_writing_obj1.writelines(str(length) + '\n')
 
