@@ -133,3 +133,8 @@ for epoch in range(configs.epochs):
                 print('length=', length.item(), 'min=', min.item())
 
                 file_writing_obj1.close()
+
+                load_balancing_eff_writing_obj = open('./lb/{}_{}.txt'.format(configs.n_j, configs.maxtask),
+                                         'a')
+
+                load_balancing_eff_writing_obj.writelines(str(load_balancing_eff) + '\n')
