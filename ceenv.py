@@ -97,17 +97,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print(self.I[0])
         return task_features, self.task_mask, self.place_time
 
-    def step(self, task_action, p_action):
-
-        # print("============================================================================================================")
-        # print("<<<<<<<<<<<<<<< task_action ")
-        # print(task_action)
-        # print("task_action >>>>>>>>>>>>>>>>")
-        #
-        # print("<<<<<<<<<<<<<<< p_action ")
-        # print(p_action)
-        # print("p_action >>>>>>>>>>>>>>>>")
-
+    def step(self, task_action, p_action, tasks_per_node):
         """Update features based on the actions of the agents"""
         for i in range(self.batch):
             if p_action[i] == 1:
@@ -119,9 +109,10 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                 self.place_time[i][1] = self.job_finish_time_on_cloudy[i][min_ind]
 
-        reward = np.zeros((self.batch, 1))
-        # print(self.job_finish_time_on_cloudy[0])
+            tasks_per_node[p_action[i] * 10 + task_action[i]] += 1
 
+        # compute reward
+        reward = np.zeros((self.batch, 1))
         for i in range(self.batch):
             selected_node = task_action[i]
             processed = False
@@ -163,7 +154,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         for i in range(self.batch):
             for j in range(self.n_j):
 
-                if self.I[i][j][0] is False and self.I[i][j][1] is False:
+                if self.I[i][j][0] == False and self.I[i][j][1] == False:
                     # EDGE
                     job_ready_time_a_e = 0
                     compute_ready_time_a_e = 0
@@ -206,7 +197,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print('F',self.Fi[0])
 
         # print(self.task_mask[0])
-        return task_feas, self.task_mask, self.place_time, reward
+        return task_feas, self.task_mask, self.place_time, reward, tasks_per_node
 
 
 """test"""

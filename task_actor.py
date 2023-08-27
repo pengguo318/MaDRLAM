@@ -101,7 +101,8 @@ class task_actor(nn.Module):
         else:
             action_index = greedy_select_action(p)
 
-        action_pro[tag + job_index] = ppp[tag + action_index]  ###############wenti
+        action_pro[tag + job_index] = ppp[tag + action_index]
+        # action_index.shape = (24,1) - number of tasks - for each task it finds suitable job
 
         datasize = np.array(data[0], dtype=np.single)
         T = np.array(data[1], dtype=np.single)
@@ -118,4 +119,4 @@ class task_actor(nn.Module):
 
             process_time[i][1] = dur_e[i][action_index[i]]
 
-        return action_index, action_pro, process_time  ##(batch,1)
+        return action_index, action_pro, process_time  # (batch,1)
