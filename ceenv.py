@@ -69,7 +69,8 @@ class CLOUD_edge(gym.Env, EzPickle):
 
         self.place_mask = np.full(shape=self.LBs.shape, fill_value=0, dtype=bool)
 
-        self.edges_energies = np.zeros(self.n_j)
+        # TODO: this is not correct, cloud node's initial energy is not equal to local node's energy
+        self.edges_energies = np.full((self.n_j, 2), fill_value=INITIAL_ENERGY)
 
         # self.Fi = np.zeros((self.batch,self.n_j,2), dtype=np.single)
         for i in range(self.batch):
@@ -99,6 +100,8 @@ class CLOUD_edge(gym.Env, EzPickle):
 
     def step(self, task_action, p_action, tasks_per_node):
         """Update features based on the actions of the agents"""
+
+        energies = [PROCESS_ENERGY_FACTOR, OFFLOAD_ENERGY_FACTOR]
         for i in range(self.batch):
             if p_action[i] == 1:
                 earliest_ind = np.argmin(self.job_finish_time_on_cloudy[i])
@@ -115,24 +118,18 @@ class CLOUD_edge(gym.Env, EzPickle):
         reward = np.zeros((self.batch, 1))
         for i in range(self.batch):
             selected_node = task_action[i]
-            processed = False
+            correct_energy_decision = False
+
+            energy_consumption = self.datasize[i][selected_node] * energies[p_action[i]]
+            self.edges_energies[selected_node][p_action[i]] -= energy_consumption
 
             #  if the task meets deadline or not
             if self.LBs[i][selected_node][p_action[i]] <= self.deadline[i][selected_node]:
                 # reducing process energy from selected edge
-                if p_action[i] == 1:
-                    energy_offload_consumption = self.datasize[i][selected_node] * OFFLOAD_ENERGY_FACTOR
-                    if self.edges_energies[selected_node] >= energy_offload_consumption:
-                        self.edges_energies[selected_node] -= energy_offload_consumption
-                        processed = True
+                if self.edges_energies[selected_node] >= energy_consumption:
+                    correct_energy_decision = True
 
-                if p_action[i] == 0:
-                    energy_process_consumption = self.datasize[i][selected_node] * PROCESS_ENERGY_FACTOR
-                    if self.edges_energies[selected_node] >= energy_process_consumption:
-                        self.edges_energies[selected_node] -= energy_process_consumption
-                        processed = True
-
-            if processed:
+            if correct_energy_decision:
                 reward[i] = self.LBs[i][selected_node][p_action[i]]
             else:
                 reward[i] = self.LBs[i][selected_node][p_action[i]] * 10
