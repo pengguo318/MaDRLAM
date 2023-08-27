@@ -120,8 +120,6 @@ for epoch in range(configs.epochs):
                     torch.save(Net1.state_dict(), os.path.join(save_dir,
                                                                'actor{}_mutil_actor.pt'.format(configs.n_j)))
 
-                    # saving load balancing efficiencies to a file
-
                     min = length
                 print(os.getcwd())
                 # file_writing_obj1 = open('/content/MaDRLAM/lr_change/lr_000005/train_vali/{}/compare{}/{}_{}.txt'.format(configs.n_j, compare,configs.n_j,configs.maxtask),
@@ -135,3 +133,8 @@ for epoch in range(configs.epochs):
                 print('length=', length.item(), 'min=', min.item())
 
                 file_writing_obj1.close()
+
+                load_balancing_eff_writing_obj = open('./lb/{}_{}.txt'.format(configs.n_j, configs.maxtask),
+                                         'a')
+
+                load_balancing_eff_writing_obj.writelines(str(load_balancing_eff) + '\n')

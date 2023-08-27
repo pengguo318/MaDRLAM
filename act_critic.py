@@ -46,7 +46,6 @@ class actor_critic(nn.Module):
 
     # this method is being called in the main.py
     def forward(self, data, train):
-
         #     node 0 to 9 are local, node 10 to 19 are cloud
         tasks_per_node = np.zeros(configs.n_j * 2)
 
@@ -148,7 +147,6 @@ class actor_critic(nn.Module):
         opt.zero_grad()
         loss.backward()
         opt.step()
-
 
 def calculate_load_balance_efficiency(tasks_per_node):
     n = len(tasks_per_node)
