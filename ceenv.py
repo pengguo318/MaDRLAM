@@ -115,24 +115,21 @@ class CLOUD_edge(gym.Env, EzPickle):
 
             tasks_per_node[p_action[i] * 10 + task_action[i]] += 1
 
+        # compute reward
         reward = np.zeros((self.batch, 1))
-        # print(self.job_finish_time_on_cloudy[0])
-
         for i in range(self.batch):
             #  if the task meets deadline or not
             if self.LBs[i][task_action[i]][p_action[i]] <= self.T[i][task_action[i]]:
-
                 reward[i] = self.LBs[i][task_action[i]][p_action[i]]
 
             else:
                 reward[i] = self.LBs[i][task_action[i]][p_action[i]] * 10
-                # print('timewindows')
 
         # print(p_action[0])
         # print('reward',reward[0])
-        earlist_time = np.zeros((self.batch, 1))
+        earliest_time = np.zeros((self.batch, 1))
         for i in range(self.batch):
-            earlist_time[i] = min(self.job_finish_time_on_cloudy[i])
+            earliest_time[i] = min(self.job_finish_time_on_cloudy[i])
         # print(earlist_time[0])
         # print(place_time[0])
 

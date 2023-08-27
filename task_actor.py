@@ -43,7 +43,7 @@ class task_actor(nn.Module):
 
         self.k = nn.Linear(hidden_dim, hidden_dim)
 
-    def forward(self, data, index, feas, mask, action_pro, train):
+    def forward(self, data, job_index, feas, mask, action_pro, train):
 
         mask = torch.from_numpy(mask).to(DEVICE)
 
@@ -81,6 +81,7 @@ class task_actor(nn.Module):
         temp.masked_fill_(mask, float('-inf'))
 
         # "p" stands for probability
+        # p.shape = (24, 10)
         p = F.softmax(temp, dim=1)
 
         # -----------------------------------------------------
@@ -96,7 +97,8 @@ class task_actor(nn.Module):
         else:
             action_index = greedy_select_action(p)
 
-        action_pro[tag + index] = ppp[tag + action_index]  ###############wenti
+        action_pro[tag + job_index] = ppp[tag + action_index]
+        # action_index.shape = (24,1) - number of tasks - for each task it finds suitable job
 
         dur_l = np.array(data[2], dtype=np.single)  # single  ##
 
@@ -115,4 +117,4 @@ class task_actor(nn.Module):
 
             process_time[i][1] = dur_e[i][action_index[i]]
 
-        return action_index, action_pro, process_time  ##(batch,1)
+        return action_index, action_pro, process_time  # (batch,1)

@@ -92,7 +92,6 @@ class place_actor(nn.Module):
         temp = torch.tanh(temp) * C
 
         p = F.softmax(temp, dim=1)  #
-
         # Probability distribution between nodes ---------------
 
         ppp = p.view(1, -1).squeeze()
