@@ -126,7 +126,7 @@ class CLOUD_edge(gym.Env, EzPickle):
             #  if the task meets deadline or not
             if self.LBs[i][selected_node][p_action[i]] <= self.deadline[i][selected_node]:
                 # reducing process energy from selected edge
-                if self.edges_energies[selected_node] >= energy_consumption:
+                if self.edges_energies[selected_node][p_action[i]] >= energy_consumption:
                     correct_energy_decision = True
 
             if correct_energy_decision:
@@ -194,7 +194,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print('F',self.Fi[0])
 
         # print(self.task_mask[0])
-        return task_feas, self.task_mask, self.place_time, reward, tasks_per_node
+        return task_feas, self.task_mask, self.place_time, reward, tasks_per_node, self.edges_energies
 
 
 """test"""
