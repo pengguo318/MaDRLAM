@@ -159,7 +159,7 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                     if self.T[i][j] < self.LBs[i][j][0]:
                         self.Fi[i][j][0] = 0
-                        self.LBs[i][j][0] = self.T[i][j]
+                        self.LBs[i][j][0] = self.T[i][j] + 1
                     else:
                         self.Fi[i][j][0] = self.T[i][j] - self.LBs[i][j][0]
 
@@ -178,7 +178,7 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                     if self.T[i][j] < self.LBs[i][j][1]:
                         # If finish time exceeds deadline, put finish time equal to deadline
-                        self.LBs[i][j][1] = self.T[i][j]
+                        self.LBs[i][j][1] = self.T[i][j] + 1
                         self.Fi[i][j][1] = 0
                     else:
                         self.Fi[i][j][1] = self.T[i][j] - self.LBs[i][j][1]
