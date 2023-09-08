@@ -76,7 +76,7 @@ class actor_critic(nn.Module):
 
             p_op_list.append(place_action)
 
-            task_feas, task_mask, place_time, reward, tasks_per_node = self.env.step(task_action, place_action, tasks_per_node)
+            task_feas, task_mask, place_time, reward, tasks_per_node, total_energy_consumption = self.env.step(task_action, place_action, tasks_per_node)
 
             rewards += reward
 
@@ -104,7 +104,7 @@ class actor_critic(nn.Module):
 
         rewards = rewards.to(torch.float32)
 
-        return task_seq, place_seq, task_action_pro, place_action_pro, rewards, load_balancing_eff
+        return task_seq, place_seq, task_action_pro, place_action_pro, rewards, load_balancing_eff, total_energy_consumption
 
     # Updates actor 1 nn
     def updata(self, task_action_pro, reward1, q, lr):# q is the reward2
