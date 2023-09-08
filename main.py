@@ -62,9 +62,9 @@ for epoch in range(configs.epochs):
         data = datas[i]
 
         # Getting information about env
-        task_seq, p_seq, task_action_pro, p_action_pro, reward1, load_balancing_eff = Net1(data, 1)
+        task_seq, p_seq, task_action_pro, p_action_pro, reward1, load_balancing_eff, energy_consumption = Net1(data, 1)
 
-        _, _, _, _, reward2, _ = Net2(data, 1)
+        _, _, _, _, reward2, _, _ = Net2(data, 1)
 
         reward1 = reward1.detach()
 
@@ -101,7 +101,7 @@ for epoch in range(configs.epochs):
                 for j in range(configs.comtesttime):
                     torch.cuda.empty_cache()
 
-                    _, _, _, _, r, _ = Net1(testdatas[j], 0)
+                    _, _, _, _, r, _, _ = Net1(testdatas[j], 0)
 
                     length = length + torch.mean(r)
 
@@ -133,3 +133,7 @@ for epoch in range(configs.epochs):
                                          'a')
 
                 load_balancing_eff_writing_obj.writelines(str(load_balancing_eff) + '\n')
+
+                energy_consumption_writing_obj = open('./ec/{}-{}.txt'.format(configs.n_j, configs.maxtask),
+                                         'a')
+                energy_consumption_writing_obj.writelines(str(energy_consumption) + '\n')

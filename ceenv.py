@@ -100,6 +100,7 @@ class CLOUD_edge(gym.Env, EzPickle):
 
     def step(self, task_action, p_action, tasks_per_node):
         """Update features based on the actions of the agents"""
+        total_energy_consumption = 0
 
         energies = [PROCESS_ENERGY_FACTOR, OFFLOAD_ENERGY_FACTOR]
         for i in range(self.batch):
@@ -121,7 +122,6 @@ class CLOUD_edge(gym.Env, EzPickle):
             correct_energy_decision = False
 
             energy_consumption = self.datasize[i][selected_node] * energies[p_action[i]]
-            self.edges_energies[selected_node][p_action[i]] -= energy_consumption
 
             #  if the task meets deadline or not
             if self.LBs[i][selected_node][p_action[i]] <= self.deadline[i][selected_node]:
@@ -130,6 +130,8 @@ class CLOUD_edge(gym.Env, EzPickle):
                     correct_energy_decision = True
 
             if correct_energy_decision:
+                self.edges_energies[selected_node][p_action[i]] -= energy_consumption
+                total_energy_consumption = total_energy_consumption + energy_consumption
                 reward[i] = self.LBs[i][selected_node][p_action[i]]
             else:
                 reward[i] = self.LBs[i][selected_node][p_action[i]] * 10
@@ -192,9 +194,10 @@ class CLOUD_edge(gym.Env, EzPickle):
 
         # print('LBs',self.LBs[0])
         # print('F',self.Fi[0])
+        print('total_energy_consumption', total_energy_consumption)
 
         # print(self.task_mask[0])
-        return task_feas, self.task_mask, self.place_time, reward, tasks_per_node, self.edges_energies
+        return task_feas, self.task_mask, self.place_time, reward, tasks_per_node, total_energy_consumption
 
 
 """test"""
