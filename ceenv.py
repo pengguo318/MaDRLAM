@@ -134,6 +134,7 @@ class CLOUD_edge(gym.Env, EzPickle):
             energy_consumption = self.datasize[i][selected_node] * energies[p_action[i]]
             #  if the task meets deadline or not
             if self.LBs[i][task_action[i]][p_action[i]] <= self.T[i][task_action[i]]:
+                total_energy_consumption = total_energy_consumption + energy_consumption
                 reward[i] = self.LBs[i][task_action[i]][p_action[i]]
 
             else:
