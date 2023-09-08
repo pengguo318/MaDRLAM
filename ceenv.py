@@ -194,7 +194,6 @@ class CLOUD_edge(gym.Env, EzPickle):
 
         # print('LBs',self.LBs[0])
         # print('F',self.Fi[0])
-        print('total_energy_consumption', total_energy_consumption)
 
         # print(self.task_mask[0])
         return task_feas, self.task_mask, self.place_time, reward, tasks_per_node, total_energy_consumption
