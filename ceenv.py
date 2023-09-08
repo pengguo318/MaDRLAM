@@ -11,7 +11,7 @@ else:
 
 """Environment for agent interaction, covering feature extraction and update"""
 
-INITIAL_ENERGY = 4000
+INITIAL_ENERGY = 20_000
 PROCESS_ENERGY_FACTOR = 2
 OFFLOAD_ENERGY_FACTOR = 1
 
