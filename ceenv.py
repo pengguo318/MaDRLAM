@@ -11,6 +11,10 @@ else:
 
 """Environment for agent interaction, covering feature extraction and update"""
 
+INITIAL_ENERGY = 20_000
+PROCESS_ENERGY_FACTOR = 2
+OFFLOAD_ENERGY_FACTOR = 1
+
 
 class CLOUD_edge(gym.Env, EzPickle):
     def __init__(self,
@@ -26,7 +30,7 @@ class CLOUD_edge(gym.Env, EzPickle):
 
         self.step_count = 0
 
-        self.L = 50  ##penalty value
+        self.L = 50  # penalty value
 
         self.number_of_jobs = n_j
 
@@ -55,7 +59,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         self.T = np.array(data[1], dtype=np.single)
         # print('####',self.T.dtype)
 
-        ##task feature
+        # task feature
         ##############################################################
         self.I = np.full(shape=(self.batch, self.n_j, 2), fill_value=0, dtype=bool)
 
@@ -73,6 +77,10 @@ class CLOUD_edge(gym.Env, EzPickle):
         self.task_mask = np.full(shape=self.T.shape, fill_value=0, dtype=bool)
 
         self.place_mask = np.full(shape=self.LBs.shape, fill_value=0, dtype=bool)
+
+        # TODO: this is not correct, cloud node's initial energy is not equal to local node's energy
+        self.edges_energies = np.full((self.n_j, 2), fill_value=INITIAL_ENERGY)
+
         # print('T',self.task_mask.shape)
         # self.Fi = np.zeros((self.batch,self.n_j,2), dtype=np.single)
         for i in range(self.batch):
@@ -94,7 +102,6 @@ class CLOUD_edge(gym.Env, EzPickle):
         task_feas = np.concatenate((self.LBm.reshape(self.batch, self.n_j, 1),
                                     self.Fim.reshape(self.batch, self.n_j, 1),
                                     self.task_mask.reshape(self.batch, self.n_j, 1),
-
                                    )
                                    , axis=2)
 
@@ -103,6 +110,9 @@ class CLOUD_edge(gym.Env, EzPickle):
 
     def step(self, task_action, p_action, tasks_per_node):
         """Update features based on the actions of the agents"""
+        total_energy_consumption = 0
+        energies = [PROCESS_ENERGY_FACTOR, OFFLOAD_ENERGY_FACTOR]
+
         for i in range(self.batch):
             if p_action[i] == 1:
                 earlist_ind = np.argmin(self.job_finish_time_on_cloudy[i])
@@ -118,6 +128,10 @@ class CLOUD_edge(gym.Env, EzPickle):
         # compute reward
         reward = np.zeros((self.batch, 1))
         for i in range(self.batch):
+
+            selected_node = task_action[i]
+
+            energy_consumption = self.datasize[i][selected_node] * energies[p_action[i]]
             #  if the task meets deadline or not
             if self.LBs[i][task_action[i]][p_action[i]] <= self.T[i][task_action[i]]:
                 reward[i] = self.LBs[i][task_action[i]][p_action[i]]
@@ -189,7 +203,7 @@ class CLOUD_edge(gym.Env, EzPickle):
         # print('F',self.Fi[0])
 
         # print(self.task_mask[0])
-        return task_feas, self.task_mask, self.place_time, reward, tasks_per_node
+        return task_feas, self.task_mask, self.place_time, reward, tasks_per_node, total_energy_consumption
 
 
 """test"""
