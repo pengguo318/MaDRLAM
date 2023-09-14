@@ -65,7 +65,7 @@ class actor_critic(nn.Module):
         for i in range(configs.n_j):
             job_index = i
 
-            task_action, action_pro, process_time = self.task_actor(data, job_index, task_feas, task_mask, action_pro, train)
+            task_action, action_pro, process_time = self.task_actor(data, job_index, task_feas, task_mask, action_pro, train)  ##选择任务
             # I think task_op determines which task has the most priority
             ind = torch.unsqueeze(task_action, 1).tolist()
 

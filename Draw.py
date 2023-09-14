@@ -13,7 +13,7 @@ def Draw():
 
     max = 8
 
-    f = open('./my_run/lr_000001_30_epochs_2500_times_second_time.txt', 'r')
+    f = open('./my_run/load_balancing/lr_000001_hidden_dim_256/reward.txt', 'r')
     # f = open('.//train_vali//{}//compare{}//{}_{}.txt'.format(configs.n_j,compare,configs.n_j,max), 'r')
 
     data = []

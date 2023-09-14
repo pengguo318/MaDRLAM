@@ -11,6 +11,8 @@ else:
 
 """Environment for agent interaction, covering feature extraction and update"""
 
+BREAKING_FACTOR = 0.1
+
 INITIAL_ENERGY = 20_000
 PROCESS_ENERGY_FACTOR = 2
 OFFLOAD_ENERGY_FACTOR = 1
@@ -107,8 +109,8 @@ class CLOUD_edge(gym.Env, EzPickle):
     def step(self, task_action, p_action, tasks_per_node):
         """Update features based on the actions of the agents"""
         total_energy_consumption = 0
-
         energies = [PROCESS_ENERGY_FACTOR, OFFLOAD_ENERGY_FACTOR]
+
         for i in range(self.batch):
             if p_action[i] == 1:
                 earliest_ind = np.argmin(self.job_finish_time_on_cloudy[i])
@@ -159,6 +161,8 @@ class CLOUD_edge(gym.Env, EzPickle):
         for i in range(self.batch):
             for j in range(self.n_j):
 
+                deadline = self.T[i][j] * BREAKING_FACTOR
+
                 if self.I[i][j][0] == False and self.I[i][j][1] == False:
                     # EDGE
                     job_ready_time_a_e = 0
@@ -168,8 +172,18 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                     # dur_l is the processing time of task i in core j in edge layer
                     job_finish_time_a_e = job_start_time_a_e + self.dur_l[i][j]
+                    # dur_l is the processing time of task i in core j
+                    job_busy_time_a_e = np.sum(self.LBs[:, j, 0])
 
-                    self.LBs[i][j][0] = job_finish_time_a_e
+                    job_finish_time_a_e = job_busy_time_a_e + job_start_time_a_e + self.dur_l[i][j]
+
+                    self.LBs[i][j][0] = job_finish_time_a_e * BREAKING_FACTOR
+
+                    if deadline < self.LBs[i][j][0]:
+                        self.Fi[i][j][0] = 0
+                        # self.LBs[i][j][0] = self.T[i][j]
+                    else:
+                        self.Fi[i][j][0] = self.T[i][j] - self.LBs[i][j][0]
 
                     # CLOUD
                     job_ready_time_a_c = self.dur_s[i][j]
@@ -177,12 +191,20 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                     job_start_time_a_c = max(job_ready_time_a_c, compute_ready_time_a_c)
 
-                    job_finished_time_a_c = job_start_time_a_c + self.dur_e[i][j]
+                    job_busy_time_a_c = np.sum(self.LBs[:, j, 1])
 
-                    self.LBs[i][j][1] = job_finished_time_a_c
+                    job_finished_time_a_c = job_busy_time_a_c + job_start_time_a_c + self.dur_e[i][j]
 
                     # calculating remained time to deadline
                     self.Fi[i][j] = self.deadline[i][j] - self.LBs[i][j]
+                    self.LBs[i][j][1] = job_finished_time_a_c * BREAKING_FACTOR
+
+                    if deadline < self.LBs[i][j][1]:
+                        # If finish time exceeds deadline, put finish time equal to deadline
+                        # self.LBs[i][j][1] = self.T[i][j]
+                        self.Fi[i][j][1] = 0
+                    else:
+                        self.Fi[i][j][1] = self.T[i][j] - self.LBs[i][j][1]
 
                     # choosing between edge and cloud
                     # based on the time that the task is finished
