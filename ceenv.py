@@ -72,6 +72,9 @@ class CLOUD_edge(gym.Env, EzPickle):
         # TODO: this is not correct, cloud node's initial energy is not equal to local node's energy
         self.edges_energies = np.full((self.n_j, 2), fill_value=INITIAL_ENERGY)
 
+        # REms stands for Reduced Energy minimum
+        self.REm = np.zeros((self.batch, self.n_j), dtype=np.single)
+
         # self.Fi = np.zeros((self.batch,self.n_j,2), dtype=np.single)
         for i in range(self.batch):
             for j in range(self.n_j):
@@ -89,9 +92,12 @@ class CLOUD_edge(gym.Env, EzPickle):
 
                 self.Fim[i][j][0] = self.Fi[i][j][1]
 
-        task_features = np.concatenate((self.LBm.reshape(self.batch, self.n_j, 1),
+
+        task_features = np.concatenate((
+                                        self.LBm.reshape(self.batch, self.n_j, 1),
                                         self.Fim.reshape(self.batch, self.n_j, 1),
                                         self.task_mask.reshape(self.batch, self.n_j, 1),
+                                        self.REm.reshape(self.batch, self.n_j, 1),
                                         )
                                        , axis=2)
 
@@ -185,10 +191,13 @@ class CLOUD_edge(gym.Env, EzPickle):
                     # is this ok ?? It chooses the Fi on cloud
                     self.Fim[i][j][0] = self.Fi[i][j][1]
 
+                    # Energy features
+                    self.REm[i][j] = min(INITIAL_ENERGY - self.edges_energies[j][0], INITIAL_ENERGY - self.edges_energies[j][1])
+
         task_feas = np.concatenate((self.LBm.reshape(self.batch, self.n_j, 1),
                                     self.Fim.reshape(self.batch, self.n_j, 1),
                                     self.task_mask.reshape(self.batch, self.n_j, 1),
-
+                                    self.REm.reshape(self.batch, self.n_j, 1)
                                     )
                                    , axis=2)
 
