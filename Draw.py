@@ -13,7 +13,8 @@ def Draw():
 
     max = 8
 
-    f = open('.//train_vali//{}//compare{}//{}_{}.txt'.format(configs.n_j,compare,configs.n_j,max), 'r')
+    f = open('./my_run/load_balancing/lr_000001_hidden_dim_256/reward.txt', 'r')
+    # f = open('.//train_vali//{}//compare{}//{}_{}.txt'.format(configs.n_j,compare,configs.n_j,max), 'r')
 
     data = []
 
