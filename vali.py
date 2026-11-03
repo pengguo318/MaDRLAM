@@ -36,7 +36,7 @@ length = torch.zeros(1).to(DEVICE)
 
 path = './train_process/{}/compare{}/actor{}_mutil_actor.pt'.format(configs.n_j,compare,configs.n_j)
 
-net1.load_state_dict(torch.load(path, DEVICE))
+net1.load_state_dict(torch.load(path, DEVICE, weights_only=True))
 
 importlib.reload(sys)
 
